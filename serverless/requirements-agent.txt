@@ -1,0 +1,41 @@
+# Agent Lambda dependencies, pinned to the versions verified working locally.
+#
+# strands-agents is installed separately with --no-deps (see build-agent.ps1).
+# Reason: it declares `mcp`, which declares `pywin32` on Windows, so pip's resolver
+# fails when building a Linux package from a Windows machine. Verified by test that
+# strands only touches mcp inside strands.tools.mcp, which this agent does not use.
+#
+# boto3 / botocore are provided by the Lambda runtime and deliberately omitted.
+
+# strands core requirements
+docstring-parser==0.17.0
+jsonschema==4.26.0
+attrs==26.1.0
+jsonschema-specifications==2024.10.1
+referencing==0.37.0
+rpds-py==0.30.0
+pydantic==2.13.4
+pydantic-core==2.46.4
+annotated-types==0.7.0
+typing-inspection==0.4.2
+typing-extensions==4.15.0
+pyyaml==6.0.3
+watchdog==6.0.0
+
+# opentelemetry (strands imports instrumentation-threading eagerly)
+opentelemetry-api==1.43.0
+opentelemetry-sdk==1.43.0
+opentelemetry-semantic-conventions==0.64b0
+opentelemetry-instrumentation==0.64b0
+opentelemetry-instrumentation-threading==0.64b0
+importlib-metadata==6.11.0
+zipp==3.21.0
+wrapt==2.2.2
+packaging==26.0
+
+# the listen tool
+requests==2.32.3
+urllib3==2.2.3
+certifi==2024.8.30
+charset-normalizer==3.4.0
+idna==3.10

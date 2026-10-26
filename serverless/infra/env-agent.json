@@ -1,0 +1,10 @@
+{
+  "Variables": {
+    "JOBS_BUCKET": "spf-jobs-414691912352",
+    "YOUTUBE_API_KEY_PARAM": "/smart-podcast-finder/youtube_api_key",
+    "LLM_PROVIDER": "bedrock",
+    "BEDROCK_MODEL_ID": "us.meta.llama3-3-70b-instruct-v1:0",
+    "BEDROCK_REGION": "us-east-1",
+    "AGENT_MODEL_ID": "us.amazon.nova-2-lite-v1:0"
+  }
+}

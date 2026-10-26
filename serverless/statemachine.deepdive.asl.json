@@ -1,0 +1,37 @@
+{
+  "Comment": "Smart Episode Finder episode deep dive. Replaces DeepDiveWorkflow.",
+  "StartAt": "DeepDive",
+  "TimeoutSeconds": 600,
+  "States": {
+    "DeepDive": {
+      "Type": "Task",
+      "Resource": "${ACTIVITIES_LAMBDA_ARN}",
+      "Parameters": {
+        "action": "deep_dive",
+        "job_id.$": "$.job_id"
+      },
+      "ResultPath": null,
+      "TimeoutSeconds": 300,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        },
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 1,
+          "BackoffRate": 2
+        }
+      ],
+      "End": true
+    }
+  }
+}

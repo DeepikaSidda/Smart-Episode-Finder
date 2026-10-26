@@ -1,0 +1,7 @@
+{
+  "Variables": {
+    "JOBS_BUCKET": "spf-jobs-414691912352",
+    "STATE_MACHINE_ARN": "arn:aws:states:us-east-1:414691912352:stateMachine:spf-insights",
+    "DEEP_DIVE_STATE_MACHINE_ARN": "arn:aws:states:us-east-1:414691912352:stateMachine:spf-deepdive"
+  }
+}

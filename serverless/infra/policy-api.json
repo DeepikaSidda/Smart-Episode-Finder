@@ -1,0 +1,29 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "JobStateReadWrite",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": "arn:aws:s3:::spf-jobs-414691912352/jobs/*"
+    },
+    {
+      "Sid": "JobStateListBucket",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::spf-jobs-414691912352"
+    },
+    {
+      "Sid": "StartPipelineExecutions",
+      "Effect": "Allow",
+      "Action": "states:StartExecution",
+      "Resource": [
+        "arn:aws:states:us-east-1:414691912352:stateMachine:spf-insights",
+        "arn:aws:states:us-east-1:414691912352:stateMachine:spf-deepdive"
+      ]
+    }
+  ]
+}

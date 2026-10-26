@@ -1,0 +1,47 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "InvokeBedrockModels",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:*::foundation-model/*",
+        "arn:aws:bedrock:*:414691912352:inference-profile/*"
+      ]
+    },
+    {
+      "Sid": "JobStateReadWrite",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": "arn:aws:s3:::spf-jobs-414691912352/jobs/*"
+    },
+    {
+      "Sid": "JobStateListBucket",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::spf-jobs-414691912352"
+    },
+    {
+      "Sid": "ReadYouTubeKeyParameter",
+      "Effect": "Allow",
+      "Action": "ssm:GetParameter",
+      "Resource": "arn:aws:ssm:us-east-1:414691912352:parameter/smart-podcast-finder/*"
+    },
+    {
+      "Sid": "DecryptSecureStringsViaSSM",
+      "Effect": "Allow",
+      "Action": "kms:Decrypt",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": { "kms:ViaService": "ssm.us-east-1.amazonaws.com" }
+      }
+    }
+  ]
+}

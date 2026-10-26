@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Podcast Finder</title>
+<title>Smart Episode Finder</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   @keyframes pulse-glow {
@@ -40,49 +40,46 @@
 </head>
 <body class="min-h-screen bg-gradient-to-br from-black via-neutral-950 to-violet-950/30 text-slate-200 font-sans">
 
-<div class="max-w-5xl mx-auto px-4 py-8">
+<!-- Flex column with explicit ordering so the YouTube results render directly
+     below the YouTube card, instead of after the podcast card further down the
+     document. Reordering here avoids moving ~70 lines of markup. -->
+<div class="max-w-5xl mx-auto px-4 py-8 flex flex-col">
 
   <!-- Header -->
-  <div class="text-center mb-8">
+  <div class="order-1 text-center mb-8">
     <h1 class="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent mb-2">
-      Smart Podcast Finder
+      Smart Episode Finder
     </h1>
-    <p class="text-slate-500 text-sm mb-3">AI that finds the episodes you'll love</p>
-    <div class="flex items-center justify-center gap-4 flex-wrap">
-      <div class="flex items-center gap-1.5">
-        <img src="https://cdn.simpleicons.org/temporal/a78bfa" alt="Temporal" class="w-4 h-4">
-        <span class="text-xs font-medium text-violet-400">Temporal</span>
-      </div>
-      <span class="text-slate-700 text-xs">+</span>
-      <div class="flex items-center gap-1.5">
-        <img src="https://cdn.simpleicons.org/googlegemini/c084fc" alt="Gemini" class="w-4 h-4">
-        <span class="text-xs font-medium text-purple-400">Gemini</span>
-      </div>
-      <span class="text-slate-700 text-xs">+</span>
-      <div class="flex items-center gap-1.5">
-        <img src="https://cdn.simpleicons.org/youtube/f87171" alt="YouTube" class="w-4 h-4">
-        <span class="text-xs font-medium text-red-300">YouTube</span>
-      </div>
-      <span class="text-slate-700 text-xs">&</span>
-      <div class="flex items-center gap-1.5">
-        <img src="https://cdn.simpleicons.org/spotify/34d399" alt="Spotify" class="w-4 h-4">
-        <span class="text-xs font-medium text-emerald-400">Spotify</span>
-      </div>
-    </div>
+    <p class="text-slate-500 text-sm mb-3">
+      Finds the YouTube videos and podcast episodes you'll actually want
+    </p>
   </div>
 
-  <!-- Compact Form Card -->
-  <div class="bg-white/5 backdrop-blur-xl border border-violet-500/10 rounded-2xl p-5 sm:p-6 mb-6">
-    <form id="form">
-      <!-- Provider Toggle -->
-      <div class="flex gap-2 mb-4">
-        <button type="button" data-provider="youtube" class="provider-btn flex-1 px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-200 bg-red-500/20 border-red-500/40 text-red-300 flex items-center justify-center gap-2">
-          <img src="https://cdn.simpleicons.org/youtube/fca5a5" alt="" class="w-4 h-4 provider-icon">YouTube
-        </button>
-        <button type="button" data-provider="spotify" class="provider-btn flex-1 px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-200 bg-white/5 border-white/10 text-slate-500 hover:bg-white/10 flex items-center justify-center gap-2">
-          <img src="https://cdn.simpleicons.org/spotify/64748b" alt="" class="w-4 h-4 provider-icon">Spotify
-        </button>
+  <!-- Card 1: YouTube channel ranking -->
+  <div class="order-2 bg-white/5 backdrop-blur-xl border border-violet-500/10 rounded-2xl p-5 sm:p-6 mb-6">
+    <div class="flex items-start justify-between gap-3 flex-wrap mb-4">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-violet-500/20 border border-violet-500/30 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-red-400 mb-0.5 flex items-center gap-1.5">
+            <img src="https://cdn.simpleicons.org/youtube/f87171" alt="" class="w-3 h-3">
+            For YouTube videos
+          </p>
+          <h2 class="text-base font-bold text-slate-100">Rank a channel by your interests</h2>
+          <p class="text-xs text-slate-500">
+            Reads the titles and descriptions of a channel's videos. It does not hear them.
+          </p>
+        </div>
       </div>
+      <span class="px-2 py-1 text-[11px] font-semibold rounded-lg bg-black/30 text-violet-300/90 border border-violet-500/20 whitespace-nowrap">
+        Reads titles &amp; descriptions
+      </span>
+    </div>
+
+    <form id="form">
+
       <input type="hidden" id="provider" value="youtube">
       <!-- Row 1: Channel + Interests side by side -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -114,11 +111,159 @@
     </form>
   </div>
 
-  <!-- Error -->
-  <div id="error" class="hidden mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-300 text-sm"></div>
+  <!-- Card 2: podcast listening agent (Amazon Transcribe tool) -->
+  <div class="order-4 relative bg-gradient-to-br from-emerald-500/[0.07] to-teal-500/[0.03] backdrop-blur-xl border border-emerald-500/25 rounded-2xl p-5 sm:p-6 mb-6 overflow-hidden">
+    <div class="absolute -top-16 -right-16 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative">
+      <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5V8a6.5 6.5 0 0 0-13 0v4a6.5 6.5 0 0 0 6.5 6.5Z"/><path d="M12 18.5V22"/><path d="M8 22h8"/></svg>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-0.5 flex items-center gap-1.5">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5V8a6.5 6.5 0 0 0-13 0v4a6.5 6.5 0 0 0 6.5 6.5Z"/><path d="M12 18.5V22"/><path d="M8 22h8"/></svg>
+              For podcasts
+            </p>
+            <h2 class="text-base font-bold text-slate-100 flex items-center gap-2 flex-wrap">
+              Listen to an episode
+              <span class="px-1.5 py-0.5 text-[10px] font-bold rounded bg-emerald-500 text-emerald-950 tracking-wide">NEW</span>
+            </h2>
+            <p class="text-xs text-slate-500">
+              Transcribes the <strong class="text-emerald-300/80 font-semibold">real audio</strong>,
+              so the agent answers from what was actually said
+            </p>
+          </div>
+        </div>
+        <span class="px-2 py-1 text-[11px] font-semibold rounded-lg bg-black/30 text-emerald-300/90 border border-emerald-500/20 whitespace-nowrap">
+          Bedrock · Nova 2 Lite &nbsp;+&nbsp; Amazon Transcribe
+        </span>
+      </div>
+
+      <!-- before / after switch -->
+      <div class="flex items-center gap-2 p-1 bg-black/30 border border-white/10 rounded-xl mb-3 w-full sm:w-auto sm:inline-flex">
+        <button type="button" id="mode-after"
+          class="flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+          Let it listen to the audio
+        </button>
+        <button type="button" id="mode-before"
+          class="flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 text-slate-500 border border-transparent hover:text-slate-300">
+          Titles only (how it worked before)
+        </button>
+      </div>
+      <p id="mode-hint" class="text-xs text-emerald-400/70 mb-4">
+        Amazon Transcribe turns the real episode audio into text, so answers come from what was said.
+      </p>
+
+      <!-- STEP 1: choose a show -->
+      <form id="show-form">
+        <label class="block text-xs font-medium text-slate-400 mb-1.5">
+          <span class="text-emerald-400 font-bold">Step 1</span> &nbsp;Name a podcast
+          <span class="text-slate-600 font-normal">— it must be a real podcast with an audio feed, not a YouTube-only channel</span>
+        </label>
+        <div class="flex gap-2 flex-wrap sm:flex-nowrap">
+          <input id="show-q" type="text" value="Syntax"
+            class="flex-1 min-w-[180px] px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 transition"
+            placeholder="e.g. Syntax, Darknet Diaries, Lex Fridman">
+          <button type="submit" id="show-btn"
+            class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-900/30 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            Find Episodes
+          </button>
+        </div>
+        <div class="flex items-center gap-2 mt-2.5 flex-wrap">
+          <span class="text-[11px] text-slate-600">Try:</span>
+          <button type="button" class="show-example px-2.5 py-1 text-[11px] rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-emerald-300 hover:border-emerald-500/30 transition" data-show="Syntax">Syntax</button>
+          <button type="button" class="show-example px-2.5 py-1 text-[11px] rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-emerald-300 hover:border-emerald-500/30 transition" data-show="Darknet Diaries">Darknet Diaries</button>
+          <button type="button" class="show-example px-2.5 py-1 text-[11px] rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-emerald-300 hover:border-emerald-500/30 transition" data-show="Lex Fridman">Lex Fridman</button>
+        </div>
+      </form>
+
+      <!-- show loading -->
+      <div id="show-loading" class="hidden mt-4 flex items-center gap-2 text-xs text-slate-400">
+        <svg class="w-3.5 h-3.5 animate-spin text-emerald-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
+        <span>Finding the show's RSS feed…</span>
+      </div>
+
+      <!-- STEP 2: choose an episode -->
+      <div id="episode-wrap" class="hidden mt-5">
+        <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+          <label class="block text-xs font-medium text-slate-400">
+            <span class="text-emerald-400 font-bold">Step 2</span> &nbsp;Pick an episode to transcribe
+          </label>
+          <span id="show-name" class="text-[11px] text-emerald-300/80 font-medium"></span>
+        </div>
+
+        <!-- how much audio to transcribe -->
+        <div class="flex items-center gap-2 mb-3 flex-wrap">
+          <span class="text-[11px] text-slate-500">Transcribe the first</span>
+          <div class="inline-flex items-center gap-1 p-1 bg-black/30 border border-white/10 rounded-lg">
+            <button type="button" class="mins-opt px-2.5 py-1 rounded text-[11px] font-semibold transition" data-mins="5">5 min</button>
+            <button type="button" class="mins-opt px-2.5 py-1 rounded text-[11px] font-semibold transition" data-mins="10">10 min</button>
+            <button type="button" class="mins-opt px-2.5 py-1 rounded text-[11px] font-semibold transition" data-mins="20">20 min</button>
+            <button type="button" class="mins-opt px-2.5 py-1 rounded text-[11px] font-semibold transition" data-mins="30">30 min</button>
+          </div>
+          <span id="mins-note" class="text-[11px] text-slate-600"></span>
+        </div>
+
+        <div id="episode-list" class="space-y-1.5 max-h-64 overflow-y-auto pr-1"></div>
+      </div>
+
+      <div id="show-error" class="hidden mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-300 text-xs"></div>
+
+      <!-- live tool trace -->
+      <div id="agent-status" class="hidden mt-5">
+        <div class="flex items-center gap-2 text-xs text-slate-300 mb-3">
+          <svg class="w-3.5 h-3.5 animate-spin text-emerald-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
+          <span id="agent-status-text" class="font-medium">Starting…</span>
+        </div>
+        <div id="agent-trace" class="space-y-1.5"></div>
+      </div>
+
+      <!-- answer -->
+      <div id="agent-answer" class="hidden mt-5">
+        <div class="flex items-stretch gap-2 mb-3 flex-wrap">
+          <div class="flex-1 min-w-[180px] px-3 py-2 rounded-xl bg-black/30 border border-white/10">
+            <p class="text-[10px] uppercase tracking-wide text-slate-600 mb-1">Tools available</p>
+            <p id="agent-tools-available" class="text-xs font-mono text-slate-400"></p>
+          </div>
+          <div id="agent-chosen-card" class="flex-1 min-w-[180px] px-3 py-2 rounded-xl border">
+            <p class="text-[10px] uppercase tracking-wide text-slate-600 mb-1">Tool the agent chose</p>
+            <p id="agent-tools" class="text-xs font-mono font-semibold"></p>
+          </div>
+        </div>
+        <div id="agent-text" class="text-sm text-slate-300 leading-relaxed bg-black/30 border border-white/10 rounded-xl p-4"></div>
+
+        <!-- the raw Amazon Transcribe output, collapsed by default -->
+        <div id="transcript-wrap" class="hidden mt-3">
+          <button type="button" id="transcript-toggle"
+            class="w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/15 transition cursor-pointer">
+            <span class="flex items-center gap-2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>
+              View the real transcript
+              <span id="transcript-meta" class="font-normal text-emerald-400/60"></span>
+            </span>
+            <svg id="transcript-chevron" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div id="transcript-body" class="hidden mt-2 bg-black/40 border border-white/10 rounded-xl p-4 max-h-72 overflow-y-auto space-y-2"></div>
+        </div>
+
+        <p class="text-[11px] text-slate-600 mt-2 flex items-center gap-1.5">
+          <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Transcript produced by Amazon Transcribe from the opening minutes of the real episode audio.
+        </p>
+      </div>
+
+      <div id="agent-error" class="hidden mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-300 text-xs"></div>
+    </div>
+  </div>
+
+  <!-- YouTube output: ordered to sit between the two cards -->
+  <div id="error" class="order-3 hidden mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-300 text-sm"></div>
 
   <!-- Pipeline Progress -->
-  <div id="progress" class="hidden mb-6">
+  <div id="progress" class="order-3 hidden mb-6">
     <div class="bg-white/5 backdrop-blur-xl border border-violet-500/10 rounded-2xl p-5 sm:p-6">
       <div id="pipeline" class="flex items-center justify-between mb-3"></div>
       <div class="text-center">
@@ -129,7 +274,7 @@
   </div>
 
   <!-- Skeleton Loading -->
-  <div id="skeleton" class="hidden space-y-5">
+  <div id="skeleton" class="order-3 hidden space-y-5 mb-6">
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
       <div class="lg:col-span-3 bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
         <div class="h-1 skeleton"></div>
@@ -168,7 +313,7 @@
   </div>
 
   <!-- Results -->
-  <div id="results" class="hidden space-y-5">
+  <div id="results" class="order-3 hidden space-y-5 mb-6">
     <!-- Summary + Key Insights: side by side -->
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-5 animate-fade-in-up" style="animation-delay: 0s">
       <div class="lg:col-span-3 bg-white/5 backdrop-blur-xl border border-violet-500/10 rounded-2xl overflow-hidden">
@@ -201,6 +346,7 @@
           <p id="dd-status" class="text-slate-600 text-xs mt-1"></p>
         </div>
         <div id="dd-content" class="hidden space-y-4">
+          <div id="dd-provenance" class="hidden p-3 rounded-xl border text-xs"></div>
           <div>
             <h4 class="text-xs uppercase tracking-wider text-violet-400 font-semibold mb-1">TL;DR</h4>
             <p id="dd-tldr" class="text-sm text-slate-300 leading-relaxed"></p>
@@ -235,14 +381,16 @@
   </div>
 
   <!-- Footer -->
-  <div class="flex flex-col items-center gap-3 mt-8">
-    <p class="text-xs text-slate-600">Smart Podcast Finder — Tech Builder Program Hackathon 2026</p>
+  <div class="order-5 flex flex-col items-center gap-3 mt-8">
+    <p class="text-xs text-slate-600">Smart Episode Finder — Tech Builder Program Hackathon 2026</p>
     <div class="flex items-center gap-3 text-xs opacity-40">
-      <img src="https://cdn.simpleicons.org/temporal/94a3b8" alt="" class="w-3 h-3">
-      <img src="https://cdn.simpleicons.org/googlegemini/94a3b8" alt="" class="w-3 h-3">
+      <img src="https://cdn.simpleicons.org/amazonwebservices/94a3b8" alt="" class="w-3 h-3">
+      <img src="https://cdn.simpleicons.org/awslambda/94a3b8" alt="" class="w-3 h-3">
       <img src="https://cdn.simpleicons.org/youtube/94a3b8" alt="" class="w-3 h-3">
-      <img src="https://cdn.simpleicons.org/spotify/94a3b8" alt="" class="w-3 h-3">
     </div>
+    <p class="text-[11px] text-slate-700">
+      Amazon Bedrock · Amazon Transcribe · AWS Lambda · Step Functions · S3 · CloudFront
+    </p>
     <div class="flex gap-4 text-xs">
       <a href="http://localhost:8233" target="_blank" class="text-slate-600 hover:text-violet-400 transition">Temporal UI</a>
       <a href="/docs" target="_blank" class="text-slate-600 hover:text-violet-400 transition">API Docs</a>
@@ -278,37 +426,10 @@ const sliderValue = document.getElementById('slider-value');
 
 slider.addEventListener('input', () => { sliderValue.textContent = slider.value; });
 
-const PROVIDER_CONFIG = {
-  youtube: { queryLabel: 'Channel Name or Keywords', queryPlaceholder: 'e.g. Lex Fridman, Fireship', sliderLabel: 'Max Videos', btnText: 'Analyze Channel', itemWord: 'videos' },
-  spotify: { queryLabel: 'Podcast or Show Name', queryPlaceholder: 'e.g. Lex Fridman, Huberman Lab', sliderLabel: 'Max Episodes', btnText: 'Analyze Show', itemWord: 'episodes' },
-};
-
-function setProvider(provider) {
-  document.getElementById('provider').value = provider;
-  const cfg = PROVIDER_CONFIG[provider];
-  document.getElementById('query-label').textContent = cfg.queryLabel;
-  document.getElementById('query').placeholder = cfg.queryPlaceholder;
-  document.getElementById('slider-label').textContent = cfg.sliderLabel;
-  btn.textContent = cfg.btnText;
-  const baseCls = 'provider-btn flex-1 px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-200 flex items-center justify-center gap-2';
-  document.querySelectorAll('.provider-btn').forEach(x => {
-    x.className = baseCls + ' bg-white/5 border-white/10 text-slate-500 hover:bg-white/10';
-  });
-  const active = document.querySelector(`[data-provider="${provider}"]`);
-  if (provider === 'spotify') {
-    active.className = baseCls + ' bg-emerald-500/20 border-emerald-500/40 text-emerald-300';
-  } else {
-    active.className = baseCls + ' bg-red-500/20 border-red-500/40 text-red-300';
-  }
-  const ytIcon = document.querySelector('[data-provider="youtube"] .provider-icon');
-  const spIcon = document.querySelector('[data-provider="spotify"] .provider-icon');
-  ytIcon.src = provider === 'youtube' ? 'https://cdn.simpleicons.org/youtube/fca5a5' : 'https://cdn.simpleicons.org/youtube/64748b';
-  spIcon.src = provider === 'spotify' ? 'https://cdn.simpleicons.org/spotify/6ee7b7' : 'https://cdn.simpleicons.org/spotify/64748b';
-}
-
-document.querySelectorAll('.provider-btn').forEach(b => {
-  b.addEventListener('click', () => setProvider(b.dataset.provider));
-});
+/* YouTube is the only provider in the UI. Spotify was removed because its API
+   exposes episode metadata but no audio, so it can never feed Amazon Transcribe,
+   and it required credentials that were never configured. */
+const ANALYZE_BTN_TEXT = 'Analyze Channel';
 
 function buildPipeline() {
   pipelineEl.innerHTML = PHASES.map((p, i) => `
@@ -382,7 +503,7 @@ async function pollStatus(wfId) {
     pollCount++;
     if (pollCount > MAX_POLLS) {
       clearInterval(poll);
-      showError('Analysis timed out. Please check the Temporal UI for workflow status.');
+      showError('Analysis timed out. Please try again.');
       return;
     }
     try {
@@ -423,25 +544,18 @@ function renderResults(data) {
   skeleton.classList.add('hidden');
   results.classList.remove('hidden');
   btn.disabled = false;
-  btn.textContent = PROVIDER_CONFIG[document.getElementById('provider').value].btnText;
+  btn.textContent = ANALYZE_BTN_TEXT;
   results.querySelectorAll('.animate-fade-in-up').forEach(el => {
     el.style.animation = 'none';
     el.offsetHeight;
     el.style.animation = '';
   });
   const summaryBar = document.getElementById('summary-bar');
-  summaryBar.className = data.provider === 'spotify'
-    ? 'h-1 bg-gradient-to-r from-emerald-500 to-emerald-600'
-    : 'h-1 bg-gradient-to-r from-violet-500 to-purple-600';
-  const isSpotify = data.provider === 'spotify';
-  const itemWord = isSpotify ? 'episodes' : 'videos';
-  const providerLabel = isSpotify ? 'Spotify' : 'YouTube';
-  const providerBadgeCls = isSpotify
-    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-    : 'bg-violet-500/20 text-violet-300 border-violet-500/30';
-  const toneBadgeCls = isSpotify
-    ? 'from-emerald-500/20 to-emerald-500/20 text-emerald-300 border-emerald-500/20'
-    : 'from-violet-500/20 to-purple-500/20 text-violet-300 border-violet-500/20';
+  summaryBar.className = 'h-1 bg-gradient-to-r from-violet-500 to-purple-600';
+  const itemWord = 'videos';
+  const providerLabel = 'YouTube';
+  const providerBadgeCls = 'bg-violet-500/20 text-violet-300 border-violet-500/30';
+  const toneBadgeCls = 'from-violet-500/20 to-purple-500/20 text-violet-300 border-violet-500/20';
   const reqCount = parseInt(slider.value) || 10;
   summary.innerHTML = `
     <div class="flex items-center gap-2 flex-wrap mb-2">
@@ -470,12 +584,12 @@ function renderResults(data) {
     insightsWrapper.classList.add('hidden');
   }
   cards.innerHTML = '';
-  const hoverShadow = isSpotify ? 'hover:shadow-emerald-500/10' : 'hover:shadow-violet-500/10';
-  const hoverText = isSpotify ? 'group-hover:text-emerald-300' : 'group-hover:text-violet-300';
+  const hoverShadow = 'hover:shadow-violet-500/10';
+  const hoverText = 'group-hover:text-violet-300';
   (data.recommendations || []).forEach((r, i) => {
-    const videoId = !isSpotify && extractVideoId(r.url);
+    const videoId = extractVideoId(r.url);
     const thumb = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null;
-    const highScore = isSpotify ? 'from-emerald-500 to-emerald-500' : 'from-violet-500 to-purple-500';
+    const highScore = 'from-violet-500 to-purple-500';
     const scoreColor = r.score >= 70 ? highScore : r.score >= 40 ? 'from-amber-500 to-orange-500' : 'from-slate-500 to-slate-600';
     const card = document.createElement('div');
     card.className = `group bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden hover:scale-[1.02] hover:shadow-lg ${hoverShadow} transition-all duration-300 block animate-fade-in-up`;
@@ -489,12 +603,6 @@ function renderResults(data) {
           <svg class="w-12 h-12 text-white drop-shadow-lg" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         </div>
         <span class="absolute bottom-2 left-2 px-2 py-0.5 text-xs font-medium rounded-lg bg-black/70 text-slate-200 backdrop-blur-sm">${r.duration}</span>
-      </a>`;
-    } else if (isSpotify) {
-      heroHtml = `
-      <a href="${r.url}" target="_blank" class="block relative cursor-pointer bg-gradient-to-br from-emerald-900/40 to-emerald-950/60 flex items-center justify-center py-6">
-        <svg class="w-10 h-10 text-emerald-400 opacity-60" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-        <span class="absolute bottom-2 left-2 px-2 py-0.5 text-xs font-medium rounded-lg bg-black/50 text-emerald-200 backdrop-blur-sm">${r.duration}</span>
       </a>`;
     }
     const viewsHtml = r.views > 0 ? `<span>${formatViews(r.views)} views</span>` : '';
@@ -523,7 +631,7 @@ function renderResults(data) {
         </div>
         <div class="flex items-center justify-between mt-2 text-xs text-slate-600">
           ${viewsHtml}
-          ${!thumb && !isSpotify ? `<span>${r.duration}</span>` : ''}
+          ${!thumb ? `<span>${r.duration}</span>` : ''}
         </div>
       </div>`;
     cards.appendChild(card);
@@ -536,7 +644,7 @@ function showError(msg) {
   errorEl.classList.remove('hidden');
   errorEl.textContent = msg;
   btn.disabled = false;
-  btn.textContent = PROVIDER_CONFIG[document.getElementById('provider').value].btnText;
+  btn.textContent = ANALYZE_BTN_TEXT;
 }
 
 function formatViews(n) { return n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : String(n); }
@@ -590,6 +698,20 @@ function renderDeepDive(data) {
   document.getElementById('dd-loading').classList.add('hidden');
   const content = document.getElementById('dd-content');
   content.classList.remove('hidden');
+
+  // Say plainly where this analysis came from. YouTube blocks cloud IP ranges, so
+  // without this the description summary reads as if it were a transcript.
+  const prov = document.getElementById('dd-provenance');
+  if (data.based_on_spoken_content) {
+    prov.className = 'p-3 rounded-xl border text-xs bg-emerald-500/10 border-emerald-500/25 text-emerald-300';
+    prov.textContent = 'Based on the actual video transcript.';
+    prov.classList.remove('hidden');
+  } else {
+    prov.className = 'p-3 rounded-xl border text-xs bg-amber-500/10 border-amber-500/30 text-amber-300';
+    prov.textContent = data.provenance_note
+      || 'No transcript was available, so this is based on the video description, not on what was said.';
+    prov.classList.remove('hidden');
+  }
   document.getElementById('dd-tldr').textContent = data.tldr || 'N/A';
   document.getElementById('dd-topics').innerHTML = (data.key_topics || []).map(t =>
     `<span class="px-2 py-0.5 text-xs rounded-full bg-fuchsia-500/10 text-fuchsia-300 border border-fuchsia-500/20">${t}</span>`
@@ -618,6 +740,386 @@ function renderDeepDive(data) {
   } else { toolsSection.classList.add('hidden'); }
   document.getElementById('dd-who').textContent = data.who_should_watch || 'N/A';
 }
+
+/* ===================== Ask the Agent ===================== */
+/* Asynchronous on purpose: an Amazon Transcribe job outlives API Gateway's 30s
+   limit, so POST /api/agent returns a job_id and we poll for the answer. */
+
+const agentStatus = document.getElementById('agent-status');
+const agentStatusText = document.getElementById('agent-status-text');
+const agentTrace = document.getElementById('agent-trace');
+const agentAnswer = document.getElementById('agent-answer');
+const agentText = document.getElementById('agent-text');
+const agentTools = document.getElementById('agent-tools');
+const agentToolsAvailable = document.getElementById('agent-tools-available');
+const agentChosenCard = document.getElementById('agent-chosen-card');
+const agentError = document.getElementById('agent-error');
+const modeAfter = document.getElementById('mode-after');
+const modeBefore = document.getElementById('mode-before');
+const modeHint = document.getElementById('mode-hint');
+
+const AGENT_MAX_POLLS = 120;
+let withEars = true;
+
+const PHASE_LABEL = {
+  queued: 'Queued…',
+  thinking: 'Agent is deciding which tool to use…',
+  analyzing: 'Fetching audio and running Amazon Transcribe…',
+  completed: 'Done',
+};
+
+/* ---- before / after switch ---- */
+const ON_CLS = 'flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+const OFF_CLS = 'flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 text-slate-500 border border-transparent hover:text-slate-300';
+const ON_CLS_GREY = 'flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 bg-slate-500/20 text-slate-300 border border-slate-500/40';
+
+function setMode(ears) {
+  withEars = ears;
+  modeAfter.className = ears ? ON_CLS : OFF_CLS;
+  modeBefore.className = ears ? OFF_CLS : ON_CLS_GREY;
+  modeHint.textContent = ears
+    ? 'Amazon Transcribe turns the real episode audio into text, so answers come from what was said.'
+    : 'The Amazon Transcribe tool is switched off, so the agent can only read episode titles — this is all it could do before the tool was added.';
+  modeHint.className = ears
+    ? 'text-xs text-emerald-400/70 mb-4'
+    : 'text-xs text-slate-500 mb-4';
+}
+modeAfter.addEventListener('click', () => setMode(true));
+modeBefore.addEventListener('click', () => setMode(false));
+
+/* ---- Step 1: find the show's episodes ---- */
+const showForm = document.getElementById('show-form');
+const showBtn = document.getElementById('show-btn');
+const showLoading = document.getElementById('show-loading');
+const showErrEl = document.getElementById('show-error');
+const showNameEl = document.getElementById('show-name');
+const episodeWrap = document.getElementById('episode-wrap');
+const episodeList = document.getElementById('episode-list');
+
+let currentShow = '';
+let currentMinutes = 10;
+
+/* ---- how much audio to transcribe ---- */
+const MINS_ON = 'mins-opt px-2.5 py-1 rounded text-[11px] font-semibold transition bg-emerald-500/20 text-emerald-300';
+const MINS_OFF = 'mins-opt px-2.5 py-1 rounded text-[11px] font-semibold transition text-slate-500 hover:text-slate-300';
+
+function setMinutes(m) {
+  currentMinutes = m;
+  document.querySelectorAll('.mins-opt').forEach(b => {
+    b.className = Number(b.dataset.mins) === m ? MINS_ON : MINS_OFF;
+  });
+  document.getElementById('mins-note').textContent =
+    m >= 20 ? 'longer takes a minute or two to transcribe' : '';
+}
+document.querySelectorAll('.mins-opt').forEach(b => {
+  b.addEventListener('click', () => setMinutes(Number(b.dataset.mins)));
+});
+
+document.querySelectorAll('.show-example').forEach(b => {
+  b.addEventListener('click', () => {
+    document.getElementById('show-q').value = b.dataset.show;
+    showForm.requestSubmit();
+  });
+});
+
+showForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const show = document.getElementById('show-q').value.trim();
+  if (!show) return;
+
+  showErrEl.classList.add('hidden');
+  episodeWrap.classList.add('hidden');
+  agentAnswer.classList.add('hidden');
+  agentStatus.classList.add('hidden');
+  showLoading.classList.remove('hidden');
+  showBtn.disabled = true;
+
+  try {
+    const res = await fetch(`/api/agent/episodes?show=${encodeURIComponent(show)}`);
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.detail || 'Could not find that show');
+
+    currentShow = body.show;
+    showNameEl.textContent = `${body.show}${body.episode_count ? ' · ' + body.episode_count + ' episodes' : ''}`;
+
+    episodeList.innerHTML = (body.episodes || []).map((ep, i) => `
+      <button type="button" class="episode-pick w-full text-left px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/10 transition group"
+        data-title="${ep.title.replace(/"/g, '&quot;')}">
+        <div class="flex items-center gap-2.5">
+          <span class="w-6 h-6 shrink-0 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-[10px] font-bold text-emerald-400">${i + 1}</span>
+          <span class="flex-1 min-w-0">
+            <span class="block text-xs font-medium text-slate-200 truncate group-hover:text-emerald-200">${ep.title}</span>
+            ${ep.published ? `<span class="block text-[10px] text-slate-600 truncate">${ep.published}</span>` : ''}
+          </span>
+          <svg class="w-3.5 h-3.5 text-slate-600 group-hover:text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5V8a6.5 6.5 0 0 0-13 0v4a6.5 6.5 0 0 0 6.5 6.5Z"/><path d="M12 18.5V22"/></svg>
+        </div>
+      </button>
+    `).join('');
+
+    episodeList.querySelectorAll('.episode-pick').forEach(btn => {
+      btn.addEventListener('click', () => askAgent(currentShow, btn.dataset.title));
+    });
+
+    episodeWrap.classList.remove('hidden');
+  } catch (err) {
+    showErrEl.textContent = err.message;
+    showErrEl.classList.remove('hidden');
+  } finally {
+    showLoading.classList.add('hidden');
+    showBtn.disabled = false;
+  }
+});
+
+/* ---- transcript panel ---- */
+document.getElementById('transcript-toggle').addEventListener('click', () => {
+  const body = document.getElementById('transcript-body');
+  const chev = document.getElementById('transcript-chevron');
+  body.classList.toggle('hidden');
+  chev.style.transform = body.classList.contains('hidden') ? '' : 'rotate(180deg)';
+});
+
+/* ---- light markdown so quotes and names stand out ----
+   Each rule stashes its generated HTML behind a sentinel token and only restores
+   it at the very end. Without that, a later rule matches the quotes inside an
+   earlier rule's class="..." attribute and corrupts the markup. */
+function fmt(text) {
+  const parts = [];
+  const hold = html => `\u0000${parts.push(html) - 1}\u0000`;
+
+  let out = (text || '').replace(/[&<>]/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+  // inline code first, so its contents are never reprocessed
+  out = out.replace(/`([^`\n]+)`/g, (_m, s) =>
+    hold(`<code class='px-1 py-0.5 rounded bg-white/10 text-emerald-300 text-xs font-mono'>${s}</code>`));
+
+  // **bold**
+  out = out.replace(/\*\*([^*\n]+)\*\*/g, (_m, s) =>
+    hold(`<strong class='text-slate-100 font-semibold'>${s}</strong>`));
+
+  // *italic*
+  out = out.replace(/(^|[\s(])\*(?!\s)([^*\n]+)\*(?=[\s).,:;!?]|$)/g, (_m, pre, s) =>
+    pre + hold(`<em class='text-slate-400'>${s}</em>`));
+
+  // "spoken quotes"
+  out = out.replace(/"([^"\n]{6,})"/g, (_m, s) =>
+    hold(`<span class='text-emerald-200/90'>&quot;${s}&quot;</span>`));
+
+  // 0:00 style timestamps
+  out = out.replace(/\b(\d{1,2}:\d{2})\b/g, (_m, s) =>
+    hold(`<span class='text-emerald-400 font-mono text-xs'>${s}</span>`));
+
+  // ---- block structure, line by line ----
+  // Done after the inline rules so headings and list items can contain bold or
+  // quoted text, and done per line rather than with <br> so that markdown
+  // headings render as headings instead of leaking literal '#' characters.
+  const lines = out.split('\n');
+  const blocks = [];
+  let listTag = null;
+
+  const closeList = () => {
+    if (listTag) { blocks.push(`</${listTag}>`); listTag = null; }
+  };
+  const openList = tag => {
+    if (listTag !== tag) {
+      closeList();
+      const cls = tag === 'ul'
+        ? 'list-disc pl-5 space-y-1 my-2 text-slate-300'
+        : 'list-decimal pl-5 space-y-1 my-2 text-slate-300';
+      blocks.push(`<${tag} class='${cls}'>`);
+      listTag = tag;
+    }
+  };
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) { closeList(); continue; }
+
+    const heading = line.match(/^(#{1,6})\s+(.*)$/);
+    if (heading) {
+      closeList();
+      const level = heading[1].length;
+      const cls = level <= 2
+        ? 'text-sm font-bold text-slate-100 mt-4 mb-1.5 first:mt-0'
+        : 'text-[11px] font-bold uppercase tracking-widest text-emerald-400/90 mt-3 mb-1 first:mt-0';
+      blocks.push(`<div class='${cls}'>${heading[2]}</div>`);
+      continue;
+    }
+
+    const bullet = line.match(/^[-*\u2022]\s+(.*)$/);
+    if (bullet) {
+      openList('ul');
+      blocks.push(`<li>${bullet[1]}</li>`);
+      continue;
+    }
+
+    const numbered = line.match(/^\d+[.)]\s+(.*)$/);
+    if (numbered) {
+      openList('ol');
+      blocks.push(`<li>${numbered[1]}</li>`);
+      continue;
+    }
+
+    closeList();
+    blocks.push(`<p class='my-1.5'>${line}</p>`);
+  }
+  closeList();
+
+  return blocks.join('').replace(/\u0000(\d+)\u0000/g, (_m, i) => parts[Number(i)]);
+}
+
+function traceLine(icon, label, tone) {
+  const colour = tone === 'green' ? 'text-emerald-300 border-emerald-500/30 bg-emerald-500/10'
+    : 'text-slate-400 border-white/10 bg-white/5';
+  return `<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-mono ${colour}">${icon}<span>${label}</span></div>`;
+}
+
+function agentReset() {
+  agentAnswer.classList.add('hidden');
+  agentError.classList.add('hidden');
+  agentStatus.classList.remove('hidden');
+  agentTrace.innerHTML = '';
+  document.getElementById('transcript-wrap').classList.add('hidden');
+  agentStatusText.textContent = 'Starting…';
+}
+
+function agentDone() {
+  agentStatus.classList.add('hidden');
+}
+
+function agentFail(msg) {
+  agentDone();
+  agentError.textContent = msg;
+  agentError.classList.remove('hidden');
+}
+
+function renderAgent(result) {
+  const used = result.tools_used || [];
+  const available = result.tools_available || [];
+  const listened = used.includes('listen_to_episode');
+
+  agentToolsAvailable.textContent = available.length ? available.join('\n') : '—';
+  agentToolsAvailable.style.whiteSpace = 'pre-line';
+
+  agentTools.textContent = used.length ? [...new Set(used)].join(', ') : 'none';
+  agentTools.className = 'text-xs font-mono font-semibold ' + (listened ? 'text-emerald-300' : 'text-slate-400');
+  agentChosenCard.className = 'flex-1 min-w-[180px] px-3 py-2 rounded-xl border ' + (listened
+    ? 'bg-emerald-500/10 border-emerald-500/30'
+    : 'bg-black/30 border-white/10');
+
+  agentText.innerHTML = fmt(result.answer || '(no answer)');
+
+  // raw Amazon Transcribe output, when the agent actually listened
+  const tr = result.transcript;
+  const wrap = document.getElementById('transcript-wrap');
+  const tbody = document.getElementById('transcript-body');
+  const tchev = document.getElementById('transcript-chevron');
+  if (tr && (tr.segments || []).length) {
+    document.getElementById('transcript-meta').textContent =
+      `· ${tr.word_count} words · ${tr.minutes_transcribed} min · ${tr.language_detected}`;
+    tbody.innerHTML = tr.segments.map(s => `
+      <div class="flex gap-3">
+        <span class="text-emerald-400 font-mono text-[11px] shrink-0 pt-0.5">${s.timestamp}</span>
+        <span class="text-xs text-slate-300 leading-relaxed">${
+          (s.text || '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))
+        }</span>
+      </div>`).join('');
+    tbody.classList.add('hidden');
+    tchev.style.transform = '';
+    wrap.classList.remove('hidden');
+  } else {
+    wrap.classList.add('hidden');
+  }
+
+  agentAnswer.classList.remove('hidden');
+  agentDone();
+}
+
+/* ---- Step 3: the agent listens to the chosen episode ---- */
+async function askAgent(showName, episodeTitle) {
+  agentReset();
+  episodeList.querySelectorAll('.episode-pick').forEach(b => {
+    b.disabled = true;
+    b.classList.add('opacity-40');
+  });
+
+  let jobId;
+  try {
+    const res = await fetch('/api/agent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        show_name: showName,
+        episode_title: episodeTitle,
+        with_ears: withEars,
+        minutes: currentMinutes,
+      }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    jobId = (await res.json()).job_id;
+  } catch (err) {
+    reenableEpisodes();
+    agentFail('Could not start the agent: ' + err.message);
+    return;
+  }
+
+  let polls = 0;
+  const seenPhases = new Set();
+  const poll = setInterval(async () => {
+    polls++;
+    if (polls > AGENT_MAX_POLLS) {
+      clearInterval(poll);
+      reenableEpisodes();
+      agentFail('Timed out waiting for the agent.');
+      return;
+    }
+    try {
+      const res = await fetch(`/api/agent/status/${jobId}`);
+      const body = await res.json();
+      if (!res.ok) {
+        clearInterval(poll);
+        agentFail(body.error || body.detail || 'The agent failed.');
+        return;
+      }
+      agentStatusText.textContent = PHASE_LABEL[body.phase] || body.detail || body.phase;
+
+      // Show each stage once, so you can watch the agent decide then listen.
+      if (body.phase && !seenPhases.has(body.phase) && body.phase !== 'completed') {
+        seenPhases.add(body.phase);
+        const isListening = body.phase === 'analyzing';
+        agentTrace.insertAdjacentHTML('beforeend', traceLine(
+          isListening
+            ? '<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 18.5a6.5 6.5 0 0 0 6.5-6.5V8a6.5 6.5 0 0 0-13 0v4a6.5 6.5 0 0 0 6.5 6.5Z"/><path d="M12 18.5V22"/></svg>'
+            : '<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+          PHASE_LABEL[body.phase] || body.phase,
+          isListening ? 'green' : 'grey'
+        ));
+      }
+
+      if (body.phase === 'completed') {
+        clearInterval(poll);
+        reenableEpisodes();
+        renderAgent(body.result || {});
+      }
+    } catch (err) {
+      if (polls > 5) {
+        clearInterval(poll);
+        reenableEpisodes();
+        agentFail('Error: ' + err.message);
+      }
+    }
+  }, 2000);
+}
+
+function reenableEpisodes() {
+  episodeList.querySelectorAll('.episode-pick').forEach(b => {
+    b.disabled = false;
+    b.classList.remove('opacity-40');
+  });
+}
+
+setMode(true);
+setMinutes(10);
 </script>
 </body>
 </html>

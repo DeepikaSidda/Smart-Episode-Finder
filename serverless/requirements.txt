@@ -1,0 +1,10 @@
+# Activities Lambda dependencies. All pure-Python or manylinux wheels, so the
+# package can be built on Windows with --platform manylinux2014_x86_64.
+# boto3/botocore are provided by the Lambda runtime and deliberately omitted.
+requests==2.32.3
+urllib3==2.2.3
+certifi==2024.8.30
+charset-normalizer==3.4.0
+idna==3.10
+defusedxml==0.7.1
+youtube-transcript-api==1.0.3

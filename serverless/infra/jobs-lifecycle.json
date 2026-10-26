@@ -1,0 +1,24 @@
+{
+  "Rules": [
+    {
+      "ID": "expire-job-records",
+      "Status": "Enabled",
+      "Filter": { "Prefix": "jobs/" },
+      "Expiration": { "Days": 7 },
+      "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+    },
+    {
+      "ID": "expire-episode-audio",
+      "Status": "Enabled",
+      "Filter": { "Prefix": "audio/" },
+      "Expiration": { "Days": 1 },
+      "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+    },
+    {
+      "ID": "expire-transcribe-output",
+      "Status": "Enabled",
+      "Filter": { "Prefix": "transcripts/" },
+      "Expiration": { "Days": 7 }
+    }
+  ]
+}

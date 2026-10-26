@@ -25,5 +25,8 @@ build/
 # Test output
 output.json
 
+# Logs
+*.log
+
 # SSH keys
 *.pem

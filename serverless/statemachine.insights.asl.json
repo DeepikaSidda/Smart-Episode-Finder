@@ -1,0 +1,232 @@
+{
+  "Comment": "Smart Episode Finder insights pipeline. Replaces PodcastInsightsWorkflow. Only job_id flows between states; the working set lives in S3.",
+  "StartAt": "Search",
+  "TimeoutSeconds": 900,
+  "States": {
+    "Search": {
+      "Type": "Task",
+      "Resource": "${ACTIVITIES_LAMBDA_ARN}",
+      "Parameters": {
+        "action": "search",
+        "job_id.$": "$.job_id"
+      },
+      "ResultPath": "$.search",
+      "TimeoutSeconds": 120,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 30
+        },
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2,
+          "MaxDelaySeconds": 30
+        }
+      ],
+      "Next": "HasVideos"
+    },
+
+    "HasVideos": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.search.has_videos",
+          "BooleanEquals": true,
+          "Next": "ParseAndTranscripts"
+        }
+      ],
+      "Default": "FinalizeEmpty"
+    },
+
+    "ParseAndTranscripts": {
+      "Type": "Parallel",
+      "Comment": "Stage 2a/2b. Branches write only their own S3 part key, never state.json, so they cannot clobber each other.",
+      "Branches": [
+        {
+          "StartAt": "ExtractInterests",
+          "States": {
+            "ExtractInterests": {
+              "Type": "Task",
+              "Resource": "${ACTIVITIES_LAMBDA_ARN}",
+              "Parameters": {
+                "action": "extract_interests",
+                "job_id.$": "$.job_id"
+              },
+              "TimeoutSeconds": 180,
+              "Retry": [
+                {
+                  "ErrorEquals": ["States.ALL"],
+                  "IntervalSeconds": 2,
+                  "MaxAttempts": 2,
+                  "BackoffRate": 2,
+                  "MaxDelaySeconds": 30
+                }
+              ],
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "FetchTranscripts",
+          "States": {
+            "FetchTranscripts": {
+              "Type": "Task",
+              "Resource": "${ACTIVITIES_LAMBDA_ARN}",
+              "Comment": "Best-effort. The handler swallows its own errors; YouTube blocks most AWS IPs so this usually returns an empty map.",
+              "Parameters": {
+                "action": "fetch_transcripts",
+                "job_id.$": "$.job_id"
+              },
+              "TimeoutSeconds": 180,
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "Lambda.ServiceException",
+                    "Lambda.AWSLambdaException",
+                    "Lambda.SdkClientException",
+                    "Lambda.TooManyRequestsException"
+                  ],
+                  "IntervalSeconds": 2,
+                  "MaxAttempts": 2,
+                  "BackoffRate": 2
+                }
+              ],
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": null,
+      "Next": "PrepareRanking"
+    },
+
+    "PrepareRanking": {
+      "Type": "Task",
+      "Resource": "${ACTIVITIES_LAMBDA_ARN}",
+      "Comment": "Sequential step so the ranking phase can be published without a Parallel branch writing state.json.",
+      "Parameters": {
+        "action": "stage2_prep",
+        "job_id.$": "$.job_id"
+      },
+      "ResultPath": null,
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "RankAndSummarize"
+    },
+
+    "RankAndSummarize": {
+      "Type": "Parallel",
+      "Comment": "Stage 3a/3b. Same isolation rule as stage 2.",
+      "Branches": [
+        {
+          "StartAt": "RankVideos",
+          "States": {
+            "RankVideos": {
+              "Type": "Task",
+              "Resource": "${ACTIVITIES_LAMBDA_ARN}",
+              "Parameters": {
+                "action": "rank",
+                "job_id.$": "$.job_id"
+              },
+              "TimeoutSeconds": 300,
+              "Retry": [
+                {
+                  "ErrorEquals": ["States.ALL"],
+                  "IntervalSeconds": 2,
+                  "MaxAttempts": 2,
+                  "BackoffRate": 2,
+                  "MaxDelaySeconds": 30
+                }
+              ],
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "GenerateSummary",
+          "States": {
+            "GenerateSummary": {
+              "Type": "Task",
+              "Resource": "${ACTIVITIES_LAMBDA_ARN}",
+              "Parameters": {
+                "action": "summary",
+                "job_id.$": "$.job_id"
+              },
+              "TimeoutSeconds": 300,
+              "Retry": [
+                {
+                  "ErrorEquals": ["States.ALL"],
+                  "IntervalSeconds": 2,
+                  "MaxAttempts": 2,
+                  "BackoffRate": 2,
+                  "MaxDelaySeconds": 30
+                }
+              ],
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": null,
+      "Next": "Finalize"
+    },
+
+    "Finalize": {
+      "Type": "Task",
+      "Resource": "${ACTIVITIES_LAMBDA_ARN}",
+      "Parameters": {
+        "action": "finalize",
+        "job_id.$": "$.job_id"
+      },
+      "ResultPath": null,
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "End": true
+    },
+
+    "FinalizeEmpty": {
+      "Type": "Task",
+      "Resource": "${ACTIVITIES_LAMBDA_ARN}",
+      "Comment": "Mirrors the early return in the Temporal workflow when no videos match.",
+      "Parameters": {
+        "action": "finalize_empty",
+        "job_id.$": "$.job_id"
+      },
+      "ResultPath": null,
+      "TimeoutSeconds": 60,
+      "Retry": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "End": true
+    }
+  }
+}

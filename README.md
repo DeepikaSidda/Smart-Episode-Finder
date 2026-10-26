@@ -1,6 +1,6 @@
 # Smart Episode Finder
 
-**Ranks YouTube videos. Listens to podcast episodes.**
+**Scores YouTube videos. Listens to podcasts.**
 
 Long-form content is hard to choose. A channel holds hundreds of uploads and a
 podcast episode can run two hours, and the title rarely tells you whether it covers
@@ -17,7 +17,7 @@ of infrastructure.
 
 ## Features
 
-### Channel video ranking
+### Channel video scoring
 
 Give it a YouTube channel name and a plain-English description of your interests.
 
@@ -52,7 +52,7 @@ An AI agent that fetches and transcribes real episode audio.
 
 ### Episode deep dive
 
-Click any ranked video for a detailed breakdown:
+Click any scored video for a detailed breakdown:
 
 - **TL;DR** — a few sentences on the episode's arc
 - **Key topics** and **5–7 actionable takeaways**
